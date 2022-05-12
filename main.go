@@ -23,6 +23,10 @@ func serveWS(pool *websocket.Pool, w http.ResponseWriter, r *http.Request) {
 	client.Read()
 }
 
+func helloWorldHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "Hello, world!")
+}
+
 func setupRoutes() {
 	pool := websocket.NewPool()
 	go pool.Start()
@@ -30,6 +34,7 @@ func setupRoutes() {
 	http.HandleFunc("/sketch-pad", func(w http.ResponseWriter, r *http.Request) {
 		serveWS(pool, w, r)
 	})
+	http.HandleFunc("/", helloWorldHandler)
 }
 
 func main() {
