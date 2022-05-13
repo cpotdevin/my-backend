@@ -1,6 +1,7 @@
 package websocket
 
 import (
+	"fmt"
 	"log"
 )
 
@@ -25,8 +26,14 @@ func (pool *Pool) Start() {
 		select {
 		case client := <-pool.Register:
 			pool.Clients[client] = true
+			for client := range pool.Clients {
+				client.Conn.WriteJSON(Message{Type: 1, Body: fmt.Sprintf("%d", len(pool.Clients))})
+			}
 		case client := <-pool.Unregister:
 			delete(pool.Clients, client)
+			for client := range pool.Clients {
+				client.Conn.WriteJSON(Message{Type: 1, Body: fmt.Sprintf("%d", len(pool.Clients))})
+			}
 		case message := <-pool.Broadcast:
 			for client := range pool.Clients {
 				if err := client.Conn.WriteJSON(message); err != nil {
